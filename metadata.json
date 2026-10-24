@@ -1,6 +1,0 @@
-{
-  "name": "Staff Leave Application Generator",
-  "description": "Institutional staff leave application form generator and print-ready A4 PDF layout for technical campus.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
