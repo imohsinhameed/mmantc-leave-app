@@ -19,6 +19,8 @@ jobs:
           shopt -s dotglob
           cp -r extracted_app/* . || true
           rm -rf extracted_app
+          # Remove conflicting lock files
+          rm -f bun.lock package-lock.json
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -31,22 +33,17 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Build Web App
+      - name: Prepare Web Directory and Capacitor
         run: |
-          npm install
-          npm run build || true
+          # Create clean www directory for standalone index.html
+          mkdir -p www
+          cp index.html www/
+          [ -d "public" ] && cp -r public/* www/ || true
 
-      - name: Initialize Capacitor Android
-        run: |
+          # Initialize fresh npm and install Capacitor
+          npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android
-          if [ -d "dist" ]; then
-            WEB_DIR="dist"
-          elif [ -d "build" ]; then
-            WEB_DIR="build"
-          else
-            WEB_DIR="."
-          fi
-          npx cap init "MMANTC Portal" "com.mmantc.leaveportal" --web-dir $WEB_DIR
+          npx cap init "MMANTC Portal" "com.mmantc.leaveportal" --web-dir www
           npx cap add android
           npx cap copy android
 
@@ -61,3 +58,4 @@ jobs:
         with:
           name: MMANTC-Leave-Portal-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          
