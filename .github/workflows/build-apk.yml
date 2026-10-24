@@ -16,7 +16,6 @@ jobs:
       - name: Extract Project Zip
         run: |
           unzip -o staff-leave-application-gen*.zip -d extracted_app
-          # Move all files from extracted folder to root
           shopt -s dotglob
           cp -r extracted_app/* . || true
           rm -rf extracted_app
@@ -24,16 +23,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
 
       - name: Build Web App
         run: |
@@ -43,7 +39,6 @@ jobs:
       - name: Initialize Capacitor Android
         run: |
           npm install @capacitor/core @capacitor/cli @capacitor/android
-          # Check if dist or build exists, otherwise use root
           if [ -d "dist" ]; then
             WEB_DIR="dist"
           elif [ -d "build" ]; then
@@ -59,11 +54,10 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: MMANTC-Leave-Portal-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
-          
